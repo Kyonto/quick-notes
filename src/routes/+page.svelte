@@ -29,6 +29,7 @@
   let isLoading = false;
   let selectedNoteId: number | null = null;
   let notesContainer: HTMLElement;
+  let searchInput: HTMLInputElement;
   let hasMoreNotes = true;
   let searchQuery = '';
   let isSearching = false;
@@ -191,8 +192,21 @@
     }
   }
 
+  function handleKeydown(event: KeyboardEvent) {
+    // Alt + Q to focus search
+    if (event.altKey && event.key.toLowerCase() === 'q') {
+      event.preventDefault();
+      searchInput?.focus();
+    }
+  }
+
   onMount(() => {
     loadNotes();
+    // Add global keyboard event listener
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
   });
 </script>
 
@@ -202,8 +216,9 @@
     <div class="w-1/3 min-w-[200px]">
       <input
         type="text"
+        bind:this={searchInput}
         class="w-full p-2 border border-gray-700 rounded-lg text-base outline-none transition-colors duration-200 focus:border-blue-500 bg-gray-800 text-gray-100 placeholder-gray-400"
-        placeholder="Search notes..."
+        placeholder="Search notes... (Alt+Q)"
         bind:value={searchQuery}
         on:input={handleSearch}
       />
